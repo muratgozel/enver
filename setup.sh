@@ -2,7 +2,6 @@
 
 apt update
 apt install -y openssh-server redis-server python3 python3-pip
-pip3 install redis cryptography paramiko clickhouse-driver
 
 mkdir -p /usr/local/lib/enver
 mkdir -p /var/log/enver
@@ -22,6 +21,15 @@ EOF
 
 cp enver.py /usr/local/bin/enver/enver
 chmod +x /usr/local/bin/enver
+
+if [ ! -d ".venv" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv venv
+else
+    echo "Virtual environment already exists."
+fi
+source .venv/bin/activate
+pip install -r requirements.txt
 
 python3 -m enver init
 
