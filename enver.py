@@ -68,12 +68,9 @@ def get_clickhouse_connection():
 def init_clickhouse():
     client = get_clickhouse_connection()
 
-    # Create database if not exists
-    client.command(f"CREATE DATABASE IF NOT EXISTS {CLICKHOUSE_DATABASE}")
-
     # Create logs table
     client.command(
-        """
+        f"""
                    CREATE TABLE IF NOT EXISTS logs
                    (
                        Timestamp Datetime64(9) CODEC(Delta(8), ZSTD(1)),
