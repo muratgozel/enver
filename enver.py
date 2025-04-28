@@ -60,6 +60,7 @@ def get_clickhouse_connection():
         port=CLICKHOUSE_PORT,
         user=CLICKHOUSE_USER,
         password=CLICKHOUSE_PASSWORD,
+        # create database in advance
         database=CLICKHOUSE_DATABASE,
     )
 
