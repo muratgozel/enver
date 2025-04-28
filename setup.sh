@@ -19,7 +19,7 @@ Match Group enver
     ForceCommand /usr/local/bin/enver
 EOF
 
-cp enver.py /usr/local/bin/enver
+cp enver /usr/local/bin/enver
 chmod +x /usr/local/bin/enver
 
 if [ ! -d ".venv" ]; then
@@ -31,6 +31,6 @@ fi
 source .venv/bin/activate
 pip install -r requirements.txt
 
-python3 -m enver init
+./enver init
 
 systemctl restart ssh
