@@ -24,7 +24,7 @@ chmod +x /usr/local/bin/enver
 
 if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    python3 -m venv venv
+    python3 -m venv .venv
 else
     echo "Virtual environment already exists."
 fi
