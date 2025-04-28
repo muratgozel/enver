@@ -3,7 +3,6 @@
 apt update
 apt install -y openssh-server redis-server python3 python3-pip python3-venv
 
-mkdir -p /usr/local/bin/enver
 mkdir -p /usr/local/lib/enver
 mkdir -p /var/log/enver
 mkdir -p /etc/enver
@@ -20,7 +19,7 @@ Match Group enver
     ForceCommand /usr/local/bin/enver
 EOF
 
-cp enver.py /usr/local/bin/enver/enver
+cp enver.py /usr/local/bin/enver
 chmod +x /usr/local/bin/enver
 
 if [ ! -d ".venv" ]; then
