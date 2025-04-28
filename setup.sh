@@ -33,4 +33,4 @@ pip install -r requirements.txt
 
 python3 -m enver init
 
-systemctl restart sshd
+systemctl restart ssh
