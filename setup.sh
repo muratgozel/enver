@@ -36,7 +36,8 @@ else
 fi
 source .venv/bin/activate
 pip install -r requirements.txt
+deactivate
 
-/usr/local/lib/enver/enver init
+su -u enver bash -c '/usr/local/lib/enver/enver init'
 
 systemctl restart ssh
