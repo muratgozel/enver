@@ -102,7 +102,7 @@ def log_action(
 ):
     try:
         client = get_clickhouse_connection()
-        client.insert(table='logs', data=[
+        client.insert(table='logs', data=[[
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
             user_id,
             project_id,
@@ -112,7 +112,7 @@ def log_action(
             status,
             ip_address,
             details
-        ], column_names=[
+        ]], column_names=[
             'Timestamp',
             'UserId',
             'ProjectId',
