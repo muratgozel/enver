@@ -19,7 +19,6 @@ Match Group enver
     X11Forwarding no
     AllowAgentForwarding no
     PermitTTY no
-    ForceCommand /usr/local/bin/enver
 EOF
 
 cp enver /usr/local/bin/enver
