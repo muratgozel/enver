@@ -102,8 +102,8 @@ def log_action(
 ):
     try:
         client = get_clickhouse_connection()
-        client.insert('logs', [
-            datetime.datetime.now(),
+        client.insert(table='logs', data=[
+            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
             user_id,
             project_id,
             mode,
@@ -112,7 +112,7 @@ def log_action(
             status,
             ip_address,
             details
-        ], [
+        ], column_names=[
             'Timestamp',
             'UserId',
             'ProjectId',
@@ -122,7 +122,7 @@ def log_action(
             'Status',
             'IpAddress',
             'Details',
-        ], CLICKHOUSE_DATABASE)
+        ])
     except Exception as e:
         logger.error(f"Failed to log action: {e}")
 
