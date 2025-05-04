@@ -50,7 +50,7 @@ CLICKHOUSE_DATABASE = os.environ.get('CLICKHOUSE_DB')
 
 # Redis connection
 def get_redis_connection():
-    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 
 # ClickHouse connection
