@@ -264,7 +264,7 @@ def add_developer_to_project(project_id, developer_id, public_key, modes=None):
     auth_keys_file = f"{home_dir}/.ssh/authorized_keys"
 
     # Command restriction: Only allow enver-client to be executed
-    command_restriction = f'command="enver {developer_id}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
+    command_restriction = f'command="enver --developer-id {developer_id}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
 
     with open(auth_keys_file, "a") as f:
         f.write(f"{command_restriction}\n")
@@ -497,6 +497,7 @@ def get_client_ip():
 # Main function to parse CLI arguments
 def main():
     parser = argparse.ArgumentParser(prog="Enver", description="Secret manager", epilog="")
+    parser.add_argument('--developer-id', help="The id of the developer who is executing a non-admin command.")
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Create project command
@@ -530,7 +531,6 @@ def main():
 
     # Set secret command
     set_parser = subparsers.add_parser("set", help="Set a secret")
-    set_parser.add_argument("developer_id", help="Developer identifier")
     set_parser.add_argument("project_id", help="Project")
     set_parser.add_argument("mode", help="Mode (development, test, production, etc.)")
     set_parser.add_argument("key", help="Key")
@@ -538,7 +538,6 @@ def main():
 
     # Get secret command
     get_parser = subparsers.add_parser("get", help="Get a secret")
-    get_parser.add_argument("developer_id", help="Developer identifier")
     get_parser.add_argument("project_id", help="Project")
     get_parser.add_argument("mode", help="Mode (development, test, production, etc.)")
     get_parser.add_argument("key", help="Key")
