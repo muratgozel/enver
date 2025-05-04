@@ -187,7 +187,7 @@ def ensure_group_exists():
 # Create OS user for a project
 def create_project_user(project_id):
     username = f"{ENVER_USER_PREFIX}{project_id}"
-    home_dir = f"/home/{project_id}"
+    home_dir = f"{ENVER_HOME_BASE}/{project_id}"
 
     try:
         pwd.getpwnam(username)
