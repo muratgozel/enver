@@ -1,3 +1,3 @@
 #!/bin/bash
-source ~/enver/.venv/bin/activate
-~/enver/enver.py "$@"
+source /usr/local/lib/enver/.venv/bin/activate
+/usr/local/lib/enver/enver.py "$@"

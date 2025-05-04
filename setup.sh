@@ -19,6 +19,8 @@ Match Group enver
     ForceCommand /usr/local/bin/enver
 EOF
 
+cp -a . /usr/local/lib/enver/
+
 cp enver /usr/local/bin/enver
 chmod +x /usr/local/bin/enver
 
@@ -31,6 +33,6 @@ fi
 source .venv/bin/activate
 pip install -r requirements.txt
 
-./enver init
+/usr/local/lib/enver/enver init
 
 systemctl restart ssh
