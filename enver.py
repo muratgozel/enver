@@ -264,7 +264,7 @@ def add_developer_to_project(project_id, developer_id, public_key, modes=None):
     auth_keys_file = f"{home_dir}/.ssh/authorized_keys"
 
     # Command restriction: Only allow enver-client to be executed
-    command_restriction = f'command="enver --developer-id {developer_id}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
+    command_restriction = f'command="enver --developer-id {developer_id} ${{SSH_ORIGINAL_COMMAND}}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
 
     with open(auth_keys_file, "a") as f:
         f.write(f"{command_restriction}\n")
