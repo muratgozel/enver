@@ -592,6 +592,10 @@ def main():
         set_secret(args.project_id, args.mode, args.key, args.value, args.developer_id, get_client_ip())
         print("Secret has been saved successfully.")
 
+    elif args.command == "get":
+        result = get_secret(args.project_id, args.mode, args.key, args.developer_id, get_client_ip())
+        print(f"{result}")
+
     else:
         parser.print_help()
         sys.exit(1)
