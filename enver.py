@@ -187,7 +187,7 @@ def ensure_group_exists():
 # Create OS user for a project
 def create_project_user(project_id):
     username = f"{ENVER_USER_PREFIX}{project_id}"
-    home_dir = f"{ENVER_HOME_BASE}/{project_id}"
+    home_dir = f"/home/{project_id}"
 
     try:
         pwd.getpwnam(username)
@@ -264,7 +264,7 @@ def add_developer_to_project(project_id, developer_id, public_key, modes=None):
     auth_keys_file = f"{home_dir}/.ssh/authorized_keys"
 
     # Command restriction: Only allow enver-client to be executed
-    command_restriction = f'command="enver --developer-id {developer_id} ${{SSH_ORIGINAL_COMMAND}}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
+    command_restriction = f'command="/usr/local/bin/enver-wrapper.sh {developer_id}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
 
     with open(auth_keys_file, "a") as f:
         f.write(f"{command_restriction}\n")

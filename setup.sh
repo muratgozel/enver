@@ -24,6 +24,8 @@ EOF
 
 cp enver /usr/local/bin/enver
 chmod +x /usr/local/bin/enver
+cp enver-wrapper.sh /usr/local/bin/enver-wrapper
+chmod +x /usr/local/bin/enver-wrapper
 
 cp -a . /usr/local/lib/enver/
 cd /usr/local/lib/enver/ || exit
