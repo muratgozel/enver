@@ -5,9 +5,12 @@ apt install -y openssh-server redis-server python3 python3-pip python3-venv
 
 mkdir -p /usr/local/lib/enver
 mkdir -p /var/log/enver
-mkdir -p /etc/enver
 
 groupadd -f enver
+useradd -g enver -d /home/enver -m -s /bin/bash enver
+chmod -R 770 /var/log/enver
+chown enver:enver /var/log/enver
+chown enver:enver /usr/local/lib/enver
 
 cat > /etc/ssh/sshd_config.d/enver.conf << EOF
 # Enver SSH Configuration
