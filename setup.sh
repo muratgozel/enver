@@ -38,6 +38,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 deactivate
 
-su -u enver bash -c '/usr/local/lib/enver/enver init'
+sudo -u enver bash -c '/usr/local/lib/enver/enver init'
 
 systemctl restart ssh
