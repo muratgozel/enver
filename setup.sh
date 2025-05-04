@@ -19,10 +19,11 @@ Match Group enver
     ForceCommand /usr/local/bin/enver
 EOF
 
-cp -a . /usr/local/lib/enver/
-
 cp enver /usr/local/bin/enver
 chmod +x /usr/local/bin/enver
+
+cp -a . /usr/local/lib/enver/
+cd /usr/local/lib/enver/ || exit
 
 if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
