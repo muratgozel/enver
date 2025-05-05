@@ -602,6 +602,12 @@ def main():
 
     elif args.command == "export":
         success, result = export_secrets(args.project_id, args.mode, args.developer_id, get_client_ip())
+        if success:
+            print(result[0])
+            print(result[1])
+        else:
+            print(f"Error: {result}")
+            sys.exit(1)
 
     else:
         parser.print_help()
