@@ -264,7 +264,7 @@ def add_developer_to_project(project_id, developer_id, public_key, modes=None):
     auth_keys_file = f"{home_dir}/.ssh/authorized_keys"
 
     # Command restriction: Only allow enver-client to be executed
-    command_restriction = f'command="/usr/local/bin/enver-wrapper {developer_id}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
+    command_restriction = f'command="/usr/local/bin/enver-ssh-wrapper {developer_id} {project_id}",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty {public_key}'
 
     with open(auth_keys_file, "a") as f:
         f.write(f"{command_restriction}\n")
@@ -498,6 +498,7 @@ def get_client_ip():
 def main():
     parser = argparse.ArgumentParser(prog="Enver", description="Secret manager", epilog="")
     parser.add_argument('--developer-id', help="The id of the developer who is executing a non-admin command.")
+    parser.add_argument('--project-id', help="The id of the project.")
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Create project command
@@ -531,16 +532,19 @@ def main():
 
     # Set secret command
     set_parser = subparsers.add_parser("set", help="Set a secret")
-    set_parser.add_argument("project_id", help="Project")
     set_parser.add_argument("mode", help="Mode (development, test, production, etc.)")
     set_parser.add_argument("key", help="Key")
     set_parser.add_argument("value", help="Value")
 
     # Get secret command
     get_parser = subparsers.add_parser("get", help="Get a secret")
-    get_parser.add_argument("project_id", help="Project")
     get_parser.add_argument("mode", help="Mode (development, test, production, etc.)")
     get_parser.add_argument("key", help="Key")
+
+    # Export secrets command
+    export_parser = subparsers.add_parser("export", help="Export secrets to a .env file")
+    export_parser.add_argument("mode", help="Environment mode (development, test, production, etc.)")
+    export_parser.add_argument("--output", help="Output filename (default: .env.<mode>)")
 
     # Initialize command
     init_parser = subparsers.add_parser("init", help="Initialize Enver system")
@@ -595,6 +599,9 @@ def main():
     elif args.command == "get":
         result = get_secret(args.project_id, args.mode, args.key, args.developer_id, get_client_ip())
         print(f"{result}")
+
+    elif args.command == "export":
+        success, result = export_secrets(args.project_id, args.mode, args.developer_id, get_client_ip())
 
     else:
         parser.print_help()
