@@ -5,5 +5,5 @@ if [ ! -d "/usr/local/bin" ]; then
     exit 1
 fi
 
-cp enver-client.sh /usr/local/bin/enver
-chmod +x /usr/local/bin/enver
+sudo cp enver-client.sh /usr/local/bin/enver
+sudo chmod +x /usr/local/bin/enver
