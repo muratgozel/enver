@@ -337,6 +337,13 @@ def get_secret(project_id, mode, key, user_id, ip_address):
     # Decrypt and return
     decrypted_value = decrypt_value(encrypted_value.decode(), project_id, mode)
 
+    # Check if the value contains references and resolve them
+    if '${' in decrypted_value:
+        # Get all secrets to resolve references
+        all_secrets = list_secrets(project_id, mode, user_id, ip_address)
+        if all_secrets:
+            decrypted_value = resolve_references(decrypted_value, all_secrets)
+
     # Log the action
     log_action(user_id, project_id, mode, "get", key, "success", ip_address)
 
