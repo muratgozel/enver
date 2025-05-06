@@ -1,5 +1,10 @@
 #!/bin/bash
 
+print_help() {
+  echo "usage (user ): enver set|get|export|remove project/mode/[key] [value] [...extra]"
+  exit 0
+}
+
 save_env_file() {
   local output="$1"
 
@@ -31,24 +36,32 @@ server_ip=65.109.167.148
 
 method="$1"
 
-if [[ "$method" == "usage" ]] || [[ "$method" == "help" ]]; then
-  echo "usage: enver set|get|export|remove project/mode/[key] [value] [...extra]"
-  exit 0
-fi
+case "$method" in
+  "set"|"get"|"export"|"remove")
+    # resolve path-like syntax
+    IFS='/' read -ra parts <<< "$2"
+    project_id=${parts[0]}
+    mode=${parts[1]}
+    key=${parts[2]:-""} # defaults to empty string if key doesn't exist
 
-IFS='/' read -ra parts <<< "$2"
-project_id=${parts[0]}
-mode=${parts[1]}
-key=${parts[2]:-""} # defaults to empty string if key doesn't exist
+    # setup ssh connection string
+    server_user="enver_$project_id"
+    ssh_conn_str="$server_user@$server_ip"
+    shift 2
+    # execute
+    result=$(ssh $ssh_conn_str "$method" "$mode" "$key" "$@")
 
-server_user="enver_$project_id"
-ssh_conn_str="$server_user@$server_ip"
-
-shift 2
-result=$(ssh $ssh_conn_str "$method" "$mode" "$key" "$@")
-
-if [[ "$method" == "export" ]]; then
-  save_env_file "$result"
-else
-  echo "$result"
-fi
+    if [[ "$method" == "export" ]]; then
+      save_env_file "$result"
+    else
+      echo "$result"
+    fi
+  ;;
+  "usage"|"help")
+    print_help
+    ;;
+  *)
+    echo "Invalid option: $1"
+    print_help
+    ;;
+esac
