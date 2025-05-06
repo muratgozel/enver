@@ -29,13 +29,23 @@ save_env_file() {
 
 server_ip=65.109.167.148
 
-project_id="$1"
+method="$1"
+
+if [[ "$method" == "usage" ]] || [[ "$method" == "help" ]]; then
+  echo "usage: enver set|get|export|remove project/mode/[key] [value] [...extra]"
+  exit 0
+fi
+
+IFS='/' read -ra parts <<< "$2"
+project_id=${parts[0]}
+mode=${parts[1]}
+key=${parts[2]:-""} # defaults to empty string if key doesn't exist
+
 server_user="enver_$project_id"
 ssh_conn_str="$server_user@$server_ip"
-method="$2"
-shift 1
 
-result=$(ssh $ssh_conn_str "$@")
+shift 2
+result=$(ssh $ssh_conn_str "$method" "$mode" "$key" "$@")
 
 if [[ "$method" == "export" ]]; then
   save_env_file "$result"
