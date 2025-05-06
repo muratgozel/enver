@@ -501,6 +501,59 @@ def get_client_ip():
     return os.environ.get('SSH_CLIENT', '').split(' ')[0] if 'SSH_CLIENT' in os.environ else 'unknown'
 
 
+def remove_secret_in_all_modes(project_id, user_id, key, ip_address):
+    redis_conn = get_redis_connection()
+    project_key = f"enver:projects:{project_id}"
+
+    if not redis_conn.exists(project_key):
+        return False, f"Project {project_id} does not exist"
+
+    # Get current modes
+    modes_json = redis_conn.hget(project_key, "modes")
+    if not modes_json:
+        modes = DEFAULT_MODES
+    else:
+        modes = json.loads(modes_json.decode())
+
+    removed_in_modes = []
+    for mode in modes:
+        result = remove_secret(project_id, user_id, mode, key, ip_address)
+        if result:
+            removed_in_modes.append(mode)
+
+    return removed_in_modes
+
+
+def remove_secret(project_id, user_id, mode, key, ip_address):
+    # Check developer access
+    if not check_developer_access(project_id, user_id, mode):
+        logger.warning(f"Access denied: {user_id} tried to get {key} in {project_id}/{mode}")
+        log_action(user_id, project_id, mode, "get", key, "denied", ip_address)
+        return None
+
+    # Get from Redis
+    redis_conn = get_redis_connection()
+    secret_key = f"enver:secrets:{project_id}:{mode}:{key}"
+    archived_key = f"enver:archive:secrets:{project_id}:{mode}:{key}"
+
+    # Check if the secret exists
+    if not redis_conn.exists(secret_key):
+        logger.warning(f"Secret {key} not found for {project_id}/{mode}")
+        log_action(user_id, project_id, mode, "remove", key, "not_found", ip_address)
+        return False
+
+    # Move from active to archive
+    pipe = redis_conn.pipeline()
+    pipe.rename(secret_key, archived_key)
+    pipe.expire(archived_key, datetime.timedelta(days=30))
+    pipe.execute()
+
+    # Log the action
+    log_action(user_id, project_id, mode, "remove", key, "archived", ip_address)
+
+    return True
+
+
 # Main function to parse CLI arguments
 def main():
     parser = argparse.ArgumentParser(prog="Enver", description="Secret manager", epilog="")
@@ -523,9 +576,7 @@ def main():
     mode_parser.add_argument("mode", help="Mode name")
 
     # Add developer command
-    dev_parser = subparsers.add_parser(
-        "add-developer", help="Add a developer to a project"
-    )
+    dev_parser = subparsers.add_parser("add-developer", help="Add a developer to a project")
     dev_parser.add_argument("project_id", help="Project identifier")
     dev_parser.add_argument("developer_id", help="Developer identifier")
     dev_parser.add_argument(
@@ -552,6 +603,11 @@ def main():
     export_parser = subparsers.add_parser("export", help="Export secrets to a .env file")
     export_parser.add_argument("mode", help="Environment mode (development, test, production, etc.)")
     export_parser.add_argument("--output", help="Output filename (default: .env.<mode>)")
+
+    # Remove secrets command
+    remove_parser = subparsers.add_parser("remove", help="Remove a secret")
+    remove_parser.add_argument("mode", help="Mode (development, test, production, etc.) or * for all")
+    remove_parser.add_argument("key", help="Key")
 
     # Initialize command
     init_parser = subparsers.add_parser("init", help="Initialize Enver system")
@@ -615,6 +671,18 @@ def main():
         else:
             print(f"Error: {result}")
             sys.exit(1)
+
+    elif args.command == "remove":
+        ip = get_client_ip()
+        if args.mode == "*":
+            removed_in_modes = remove_secret_in_all_modes(args.project_id, args.developer_id, args.key, ip)
+            print(f"Secret has been removed in the following modes: {removed_in_modes}")
+        else:
+            removed = remove_secret(args.project_id, args.developer_id, args.mode, args.key, ip)
+            if removed:
+                print("Secret has been removed successfully.")
+            else:
+                print("Failed to remove secret.")
 
     else:
         parser.print_help()
