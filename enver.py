@@ -407,7 +407,7 @@ def resolve_references(value, secrets):
 
 
 # Export secrets to env file
-def export_secrets(project_id, mode, user_id, ip_address):
+def export_secrets(project_id, mode, user_id, output, ip_address):
     # Get all secrets
     secrets = list_secrets(project_id, mode, user_id, ip_address)
     if not secrets:
@@ -426,7 +426,7 @@ def export_secrets(project_id, mode, user_id, ip_address):
         env_content += f"{key}='{escaped_value}'\n"
 
     # Generate filename
-    filename = ENV_FILE_TEMPLATE.format(mode=mode)
+    filename = output if output is not None else ENV_FILE_TEMPLATE.format(mode=mode)
 
     # Log the action
     log_action(user_id, project_id, mode, "export", "*", "success", ip_address)
@@ -664,7 +664,7 @@ def main():
         print(f"{result}")
 
     elif args.command == "export":
-        success, result = export_secrets(args.project_id, args.mode, args.developer_id, get_client_ip())
+        success, result = export_secrets(args.project_id, args.mode, args.developer_id, args.output, get_client_ip())
         if success:
             print(result[0])
             print(result[1])
