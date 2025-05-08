@@ -70,29 +70,26 @@ def init_clickhouse():
     client = get_clickhouse_connection()
 
     # Create logs table
-    client.command(
-        f"""
-                   CREATE TABLE IF NOT EXISTS logs
-                   (
-                       Timestamp Datetime64(9) CODEC(Delta(8), ZSTD(1)),
-                       UserId LowCardinality(String) CODEC(ZSTD(1)),
-                       ProjectId LowCardinality(String) CODEC(ZSTD(1)),
-                       Mode LowCardinality(String) CODEC(ZSTD(1)),
-                       Action LowCardinality(String) CODEC(ZSTD(1)),
-                       SecretKey LowCardinality(String) CODEC(ZSTD(1)),
-                       Status LowCardinality(String) CODEC(ZSTD(1)),
-                       IpAddress LowCardinality(String) CODEC(ZSTD(1)),
-                       Details LowCardinality(Nullable(String)) CODEC(ZSTD(1))
-                   ) ENGINE = MergeTree
-                   (
-                   )
-                       ORDER BY
-                   (
-                       Timestamp,
-                       ProjectId,
-                       UserId
-                   )
-                   """
+    # can use LowCardinality if column has less than ~1000 unique values
+    client.command(f"""
+       CREATE TABLE IF NOT EXISTS logs
+       (
+           Timestamp Datetime64(6) CODEC(Delta, ZSTD),
+           UserId LowCardinality(String) CODEC(ZSTD),
+           ProjectId LowCardinality(String) CODEC(ZSTD),
+           Mode LowCardinality(String) CODEC(ZSTD),
+           Action LowCardinality(String) CODEC(ZSTD),
+           SecretKey String CODEC(ZSTD),
+           Status LowCardinality(String) CODEC(ZSTD),
+           IpAddress String CODEC(ZSTD),
+           Details String CODEC(ZSTD)
+       )
+       ENGINE = MergeTree
+       PARTITION BY toDate(Timestamp)
+       ORDER BY (Timestamp, ProjectId, UserId, Mode)
+       TTL toDateTime(Timestamp) + toIntervalDay(30)
+       SETTINGS ttl_only_drop_parts = 1;
+       """
     )
 
 
