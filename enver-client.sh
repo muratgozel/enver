@@ -2,6 +2,7 @@
 
 print_help() {
   echo "usage (user ): enver set|get|export|remove project/mode/[key] [value] [...extra]"
+  echo "usage (admin): enver create-project|add-mode|add-developer [...args]"
   exit 0
 }
 
@@ -37,6 +38,10 @@ server_ip=188.245.119.40
 method="$1"
 
 case "$method" in
+  "create-project"|"add-mode"|"add-developer")
+    result=$(ssh enver enver "$@")
+    echo "$result"
+  ;;
   "set"|"get"|"export"|"remove")
     # resolve path-like syntax
     IFS='/' read -ra parts <<< "$2"
