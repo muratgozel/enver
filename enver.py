@@ -40,17 +40,18 @@ DEFAULT_MODES = ["development", "test", "production"]
 ENV_FILE_TEMPLATE = ".env.{mode}"
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = int(os.environ.get('REDIS_PORT'))
-REDIS_DB = 0
+REDIS_DB = os.environ.get('REDIS_DB')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 CLICKHOUSE_HOST = os.environ.get('CLICKHOUSE_HOST')
 CLICKHOUSE_PORT = int(os.environ.get('CLICKHOUSE_PORT'))
 CLICKHOUSE_USER = os.environ.get('CLICKHOUSE_USER')
-CLICKHOUSE_PASSWORD = ""
+CLICKHOUSE_PASSWORD = os.environ.get('CLICKHOUSE_PASSWORD')
 CLICKHOUSE_DATABASE = os.environ.get('CLICKHOUSE_DB')
 
 
 # Redis connection
 def get_redis_connection():
-    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, password=REDIS_PASSWORD)
 
 
 # ClickHouse connection
