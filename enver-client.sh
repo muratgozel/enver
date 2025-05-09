@@ -32,7 +32,7 @@ save_env_file() {
   return 0
 }
 
-server_ip=65.109.167.148
+server_ip=188.245.119.40
 
 method="$1"
 
